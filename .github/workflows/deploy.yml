@@ -1,0 +1,24 @@
+name: Deploy files to local machine
+
+on:
+  push:
+    branches:
+      - main  # or any other branch you want to monitor
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Transfer files to local machine
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          TARGET_DIR: /home/fcc/atos  # Replace with your desired directory
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          rsync -avz -e "ssh -o StrictHostKeyChecking=no" . user@your_local_machine_ip:$TARGET_DIR
